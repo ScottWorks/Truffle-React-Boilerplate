@@ -38,6 +38,20 @@ class App extends Component {
     }
   };
 
+  componentWillUpdate = async (prevProps) => {
+    const { account, web3 } = this.state;
+
+    console.log(prevProps.account, account);
+
+    if (prevProps.account !== account) {
+      const accounts = await web3.eth.getAccounts();
+
+      this.setState({
+        account: accounts[0]
+      });
+    }
+  };
+
   handleLoading = () => {
     this.setState({
       isLoading: false
