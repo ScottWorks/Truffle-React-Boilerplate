@@ -25,8 +25,6 @@ class App extends Component {
       const accounts = await web3.eth.getAccounts();
       const contract = await getContractInstance(web3, SimpleStorageContract);
 
-      console.log(web3, accounts, contract);
-
       this.setState(
         {
           account: accounts[0],
@@ -38,6 +36,20 @@ class App extends Component {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  componentDidUpdate = async () => {
+    const { account, web3 } = this.state;
+
+    await web3.currentProvider.publicConfigStore.on('update', (result) => {
+      let newAccount = result.selectedAddress;
+
+      if (account !== newAccount) {
+        this.setState({
+          account: newAccount
+        });
+      }
+    });
   };
 
   getValue = async () => {

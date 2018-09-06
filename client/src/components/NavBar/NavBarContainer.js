@@ -13,8 +13,6 @@ class NavbarContainer extends Component {
     try {
       const { account, web3 } = this.props.data;
 
-      console.log(web3, account);
-
       const balance = await web3.eth.getBalance(account);
       const balanceInEther = web3.utils.fromWei(balance, 'ether');
       const balanceRounded = Number.parseFloat(balanceInEther).toPrecision(6);
