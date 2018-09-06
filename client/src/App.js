@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Switch, Route } from 'react-router';
+import Identicon from 'identicon.js';
 
 import getContractInstance from './utils/getContractInstance';
 import getWeb3 from './utils/getWeb3';
@@ -14,6 +15,7 @@ class App extends Component {
   state = {
     account: null,
     contract: null,
+    icon: null,
     isLoading: true,
     value: null,
     web3: null
@@ -23,11 +25,14 @@ class App extends Component {
     try {
       const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
+      const account = accounts[0];
       const contract = await getContractInstance(web3, SimpleStorageContract);
+
+      this.getIcon(account);
 
       this.setState(
         {
-          account: accounts[0],
+          account: account,
           contract: contract,
           web3: web3
         },
@@ -41,14 +46,26 @@ class App extends Component {
   componentDidUpdate = async () => {
     const { account, web3 } = this.state;
 
-    await web3.currentProvider.publicConfigStore.on('update', (result) => {
-      let newAccount = result.selectedAddress;
+    if (web3) {
+      await web3.currentProvider.publicConfigStore.on('update', (result) => {
+        let newAccount = result.selectedAddress;
 
-      if (account !== newAccount) {
-        this.setState({
-          account: newAccount
-        });
-      }
+        if (account !== newAccount) {
+          this.getIcon(account);
+
+          this.setState({
+            account: newAccount
+          });
+        }
+      });
+    }
+  };
+
+  getIcon = (account) => {
+    const icon = new Identicon(account, 65).toString();
+
+    this.setState({
+      icon: icon
     });
   };
 
@@ -69,7 +86,7 @@ class App extends Component {
   };
 
   render() {
-    const { account, contract, isLoading, value, web3 } = this.state;
+    const { account, contract, icon, isLoading, value, web3 } = this.state;
 
     if (isLoading) {
       return (
@@ -80,7 +97,7 @@ class App extends Component {
     } else {
       return (
         <div>
-          <NavBarContainer data={{ account, web3 }} />
+          <NavBarContainer data={{ account, icon, web3 }} />
           <Switch>
             <Route
               exact
