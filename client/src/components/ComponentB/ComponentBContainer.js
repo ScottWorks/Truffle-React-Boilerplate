@@ -18,9 +18,13 @@ class ComponentBContainer extends Component {
     const { account, contract } = this.props.data;
     const { newValue } = this.state;
 
-    await contract.methods.set(newValue).send({ from: account });
+    let storedData = await contract.methods
+      .set(newValue)
+      .send({ from: account });
 
-    this.props.getValue();
+    let value = storedData.events.LogStoredData.returnValues._storedData;
+
+    this.props.updateValue(value);
 
     this.setState({
       newValue: ''

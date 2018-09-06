@@ -36,7 +36,10 @@ class App extends Component {
           contract: contract,
           web3: web3
         },
-        () => this.handleLoading()
+        () => {
+          this.handleLoading();
+          this.getValue();
+        }
       );
     } catch (error) {
       console.log(error);
@@ -51,7 +54,7 @@ class App extends Component {
         let newAccount = result.selectedAddress;
 
         if (account !== newAccount) {
-          this.getIcon(account);
+          this.getIcon(newAccount);
 
           this.setState({
             account: newAccount
@@ -74,6 +77,12 @@ class App extends Component {
 
     let value = await contract.methods.get().call();
 
+    this.setState({
+      value: value
+    });
+  };
+
+  updateValue = (value) => {
     this.setState({
       value: value
     });
@@ -124,7 +133,7 @@ class App extends Component {
                     account,
                     contract
                   }}
-                  getValue={this.getValue}
+                  updateValue={this.updateValue}
                 />
               )}
             />

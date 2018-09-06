@@ -4,8 +4,6 @@ function ComponentB(props) {
   const { handleChange, setValue } = props;
   const { newValue } = props.data;
 
-  console.log(newValue);
-
   return (
     <div>
       <br />
