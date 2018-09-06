@@ -11,45 +11,43 @@ import NavBarContainer from './components/NavBar/NavBarContainer';
 import SimpleStorageContract from './contracts/SimpleStorage.json';
 
 class App extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      account: null,
-      isLoading: true,
-      web3: null
-    };
-  }
+  state = {
+    account: null,
+    contract: null,
+    isLoading: true,
+    value: null,
+    web3: null
+  };
 
   componentDidMount = async () => {
     try {
       const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
-
       const contract = await getContractInstance(web3, SimpleStorageContract);
 
-      this.setState({
-        account: accounts[0],
-        contract: contract,
-        web3: web3
-      });
+      console.log(web3, accounts, contract);
+
+      this.setState(
+        {
+          account: accounts[0],
+          contract: contract,
+          web3: web3
+        },
+        () => this.handleLoading()
+      );
     } catch (error) {
       console.log(error);
     }
   };
 
-  componentWillUpdate = async (prevProps) => {
-    const { account, web3 } = this.state;
+  getValue = async () => {
+    const { contract } = this.state;
 
-    console.log(prevProps.account, account);
+    let value = await contract.methods.get().call();
 
-    if (prevProps.account !== account) {
-      const accounts = await web3.eth.getAccounts();
-
-      this.setState({
-        account: accounts[0]
-      });
-    }
+    this.setState({
+      value: value
+    });
   };
 
   handleLoading = () => {
@@ -59,7 +57,7 @@ class App extends Component {
   };
 
   render() {
-    const { account, isLoading, web3 } = this.state;
+    const { account, contract, isLoading, value, web3 } = this.state;
 
     if (isLoading) {
       return (
@@ -67,40 +65,44 @@ class App extends Component {
           <p>Loading all the goodies...</p>
         </div>
       );
+    } else {
+      return (
+        <div>
+          <NavBarContainer data={{ account, web3 }} />
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={(props) => (
+                <ComponentAContainer
+                  data={{
+                    ...props,
+                    account,
+                    contract,
+                    value,
+                    web3
+                  }}
+                  getValue={this.getValue}
+                />
+              )}
+            />
+            <Route
+              path="/:account"
+              render={(props) => (
+                <ComponentBContainer
+                  data={{
+                    ...props,
+                    account,
+                    contract
+                  }}
+                  getValue={this.getValue}
+                />
+              )}
+            />
+          </Switch>
+        </div>
+      );
     }
-
-    return (
-      <div>
-        <NavBarContainer data={{ account, web3 }} />
-        <Switch>
-          <Route
-            exact
-            path="/"
-            render={(props) => (
-              <ComponentAContainer
-                data={{
-                  ...props,
-                  account,
-                  web3
-                }}
-              />
-            )}
-          />
-          <Route
-            path="/:id"
-            render={(props) => (
-              <ComponentBContainer
-                data={{
-                  ...props,
-                  account,
-                  web3
-                }}
-              />
-            )}
-          />
-        </Switch>
-      </div>
-    );
   }
 }
 

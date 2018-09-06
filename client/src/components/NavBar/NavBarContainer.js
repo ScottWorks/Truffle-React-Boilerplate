@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import Identicon from 'identicon.js';
 
-import Navbar from './Navbar';
+import Navbar from './NavBar';
 
 class NavbarContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      balance: null,
-      icon: null
-    };
-  }
+  state = {
+    balance: null,
+    icon: null
+  };
 
   componentDidMount = async () => {
     try {
       const { account, web3 } = this.props.data;
+
+      console.log(web3, account);
 
       const balance = await web3.eth.getBalance(account);
       const balanceInEther = web3.utils.fromWei(balance, 'ether');
