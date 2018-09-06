@@ -9,7 +9,6 @@ class ComponentBContainer extends Component {
   };
 
   handleChange = (key, value) => {
-    console.log(value);
     this.setState({
       [key]: value
     });
@@ -29,8 +28,14 @@ class ComponentBContainer extends Component {
   };
 
   render() {
+    const { newValue } = this.state;
+
     return (
-      <ComponentB handleChange={this.handleChange} setValue={this.setValue} />
+      <ComponentB
+        data={{ newValue }}
+        handleChange={this.handleChange}
+        setValue={this.setValue}
+      />
     );
   }
 }
